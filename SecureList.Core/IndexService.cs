@@ -9,30 +9,29 @@ public class IndexService(PasswordRepository passwordRepository)
 
     public void Index(Dictionary<string, string> passwords)
     {
-        // Groups passwords by the first character (case-sensitive) of their keys
-        // then chunks each group into subgroups, each containing a maximum number of lines specified by StaticDetails.MaximumLineNumberInIndexFiles.
         var charGroups = passwords
             .GroupBy(kvp => kvp.Key[0].ToString(), StringComparer.Ordinal)
-            .Select(charGroup => charGroup.Chunk(StaticDetails.MaximumLineNumberInIndexFiles))
-            .ToList();
+            .Select(k =>
+                k.Select(kvp => new
+                {
+                    Password = kvp.Key,
+                    Filename = kvp.Value,
+                    Hashes = CryptographyHelper.CalculateHashes(kvp.Key)
+                })
+                .Select(a => $"{a.Password}|{a.Hashes.md5Hash}|{a.Hashes.sha1Hash}|{a.Hashes.sha256Hash}|{a.Filename}")
+            )
+            .Select(charGroup => charGroup.Chunk(StaticDetails.MaximumLineNumberInIndexFiles));
 
         int fileNaming = 0;
         foreach (var chGroup in charGroups)
         {
             foreach (var chunk in chGroup)
             {
-                foreach (var line in chunk)
-                {
-                    var password = line.Key;
-                    var filePath = line.Value;
+                var directory = FileHelper.CreateSubdirectoryInIndexDirectoryWithChar(chunk.First()[0]);
+                var filePath = Path.Combine(directory.ToString(), $"{fileNaming}.txt");
 
-                    var directory = FileHelper.CreateSubdirectoryInIndexDirectoryWithChar(password[0]);
-                    var (md5Hash, sha1Hash, sha256Hash) = CryptographyHelper.CalculateHashes(password);
+                File.AppendAllLines(filePath, chunk);
 
-                    File.AppendAllText(
-                        path: Path.Combine(directory.ToString(), $"{fileNaming}.txt"),
-                        contents: $"{password}|{md5Hash}|{sha1Hash}|{sha256Hash}|{filePath}\n");
-                }
                 fileNaming++;
             }
         }
