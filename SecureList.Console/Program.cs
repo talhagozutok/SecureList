@@ -1,6 +1,10 @@
 ﻿using SecureList.Core;
 using SecureList.Core.Entities;
 
+// Set the encoding to UTF-8 for proper IO.
+Console.InputEncoding = System.Text.Encoding.UTF8;
+Console.OutputEncoding = System.Text.Encoding.UTF8;
+
 var passwordRepository = PasswordRepository.Instance;
 var passwordsDirectory = new PasswordsDirectory();
 var passwordFiles = passwordsDirectory.Files;
@@ -68,8 +72,6 @@ do
         passwordRepository.Passwords.TryAdd(userInput, fileName);
         indexService.Index(passwordRepository.Passwords);
 
-        // Set the output encoding to UTF-8 for proper display of checkmark symbol.
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
         // Display checkmark symbol to indicate successful addition of the password.
         Console.Write("\u2714");
     }
