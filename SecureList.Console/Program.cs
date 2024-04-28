@@ -43,17 +43,19 @@ do
         Console.Write("Ekleniyor...");
 
         var fileName = "userDefined.txt";
-        var processedFile = Path.Join(StaticDetails.ProcessedDirectory, fileName);
-        var unprocessedFile = Path.Join(StaticDetails.UnprocessedPasswordsDirectory, fileName);
+        var processedDir = StaticDetails.ProcessedDirectory;
+        var unprocessedDir = StaticDetails.UnprocessedPasswordsDirectory;
+        var processedFile = Path.Join(processedDir, fileName);
+        var unprocessedFile = Path.Join(unprocessedDir, fileName);
 
-        if (!File.Exists(unprocessedFile))
+        if (!Directory.Exists(processedDir))
         {
-            File.Create(unprocessedFile);
+            Directory.CreateDirectory(processedDir);
         }
 
-        if (!File.Exists(processedFile))
+        if (!Directory.Exists(unprocessedDir))
         {
-            File.Create(processedFile);
+            Directory.CreateDirectory(unprocessedDir);
         }
 
         // Append the new password to the unprocessed passwords file.
