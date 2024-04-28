@@ -46,16 +46,29 @@ do
         var processedFile = Path.Join(StaticDetails.ProcessedDirectory, fileName);
         var unprocessedFile = Path.Join(StaticDetails.UnprocessedPasswordsDirectory, fileName);
 
-        // append new password to `Unprocessed-Password` and `Processed` directories
-        // then add it to passwordRepository.Passwords
-        File.AppendAllText(unprocessedFile, $"{userInput}\n");
-        File.AppendAllText(processedFile, $"{userInput}\n");
-        passwordRepository.Passwords.TryAdd(userInput, fileName);
+        if (!File.Exists(unprocessedFile))
+        {
+            File.Create(unprocessedFile);
+        }
 
-        // reindex
+        if (!File.Exists(processedFile))
+        {
+            File.Create(processedFile);
+        }
+
+        // Append the new password to the unprocessed passwords file.
+        File.AppendAllText(unprocessedFile, $"{userInput}\n");
+        // Append the new password to the processed passwords file.
+        File.AppendAllText(processedFile, $"{userInput}\n");
+
+        // Add password to repository
+        // then reindex the password repository.
+        passwordRepository.Passwords.TryAdd(userInput, fileName);
         indexService.Index(passwordRepository.Passwords);
 
+        // Set the output encoding to UTF-8 for proper display of checkmark symbol.
         Console.OutputEncoding = System.Text.Encoding.UTF8;
+        // Display checkmark symbol to indicate successful addition of the password.
         Console.Write("\u2714");
     }
 
