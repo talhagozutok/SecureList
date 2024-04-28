@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SecureList.Console\SecureList.Console.csproj" />
+  <Project Path="SecureList.Core\SecureList.Core.csproj" />
+</Solution>
