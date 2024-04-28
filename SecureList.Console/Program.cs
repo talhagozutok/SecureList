@@ -39,7 +39,24 @@ do
     }
     else
     {
-        Console.WriteLine($"Şifre bulunamadı.");
+        Console.WriteLine("Şifre bulunamadı.");
+        Console.Write("Ekleniyor...");
+
+        var fileName = "userDefined.txt";
+        var processedFile = Path.Join(StaticDetails.ProcessedDirectory, fileName);
+        var unprocessedFile = Path.Join(StaticDetails.UnprocessedPasswordsDirectory, fileName);
+
+        // append new password to `Unprocessed-Password` and `Processed` directories
+        // then add it to passwordRepository.Passwords
+        File.AppendAllText(unprocessedFile, $"{userInput}\n");
+        File.AppendAllText(processedFile, $"{userInput}\n");
+        passwordRepository.Passwords.TryAdd(userInput, fileName);
+
+        // reindex
+        indexService.Index(passwordRepository.Passwords);
+
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.Write("\u2714");
     }
 
     Console.Write($"\nTekrar arama yapmak için bir tuşa basın..."); Console.ReadKey();
