@@ -36,7 +36,7 @@ public class IndexService(PasswordRepository passwordRepository)
                 var directory = FileHelper.CreateSubdirectoryInIndexDirectoryWithChar(chunk.First()[0]);
                 var filePath = Path.Combine(directory.ToString(), $"{fileNaming}.txt");
 
-                File.AppendAllLines(filePath, chunk);
+                File.WriteAllLines(filePath, chunk);
 
                 fileNaming++;
             }
