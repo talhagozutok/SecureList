@@ -79,9 +79,4 @@ public static class FileHelper
 
         return createdDirectory;
     }
-
-    public static int GetLineNumber(string filePath)
-    {
-        return File.ReadLines(filePath).Count();
-    }
 }
