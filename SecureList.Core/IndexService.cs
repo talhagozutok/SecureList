@@ -7,9 +7,9 @@ public class IndexService(PasswordRepository passwordRepository)
 {
     private readonly PasswordRepository _passwordRepository = passwordRepository;
 
-    public void Index(Dictionary<string, string> passwords)
+    public void Index()
     {
-        var charGroups = passwords
+        var charGroups = _passwordRepository.Passwords
             .Where(pf => !string.IsNullOrEmpty(pf.Key))
             // Group passwords by the first character (case-sensitive) of their keys
             .GroupBy(kvp => kvp.Key[0].ToString(), StringComparer.Ordinal)

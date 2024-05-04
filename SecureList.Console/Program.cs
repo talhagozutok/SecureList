@@ -18,7 +18,7 @@ foreach (var passwordFile in passwordFiles)
     }
 }
 
-indexService.Index(passwordRepository.Passwords);
+indexService.Index();
 indexService.ReadIndex();
 
 string? userInput;
@@ -70,7 +70,7 @@ do
         // Add password to repository
         // then reindex the password repository.
         passwordRepository.Passwords.TryAdd(userInput, fileName);
-        indexService.Index(passwordRepository.Passwords);
+        indexService.Index();
 
         // Display checkmark symbol to indicate successful addition of the password.
         Console.Write("\u2714");
