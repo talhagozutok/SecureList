@@ -41,7 +41,7 @@ public class PasswordFile(string fileName) : FileSystemInfo
             return false;
         }
 
-        _isProcessed = false;
+        _isProcessed = true;
 
         return true;
     }
