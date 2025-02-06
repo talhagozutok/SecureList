@@ -10,36 +10,26 @@ public class IndexService(PasswordRepository passwordRepository)
     public void Index()
     {
         var charGroups = _passwordRepository.Passwords
-            .Where(pf => !string.IsNullOrEmpty(pf.Key))
-            // Group passwords by the first character (case-sensitive) of their keys
+            .Where(kvp => !string.IsNullOrEmpty(kvp.Key))
             .GroupBy(kvp => kvp.Key[0].ToString(), StringComparer.Ordinal)
-            // For each group of passwords starting with the same character...
-            .Select(k =>
-                // Map each key-value pair to an anonymous type containing password, filename, and hashes
-                k.Select(kvp => new
-                {
-                    Password = kvp.Key, // Extract the password
-                    Filename = kvp.Value, // Extract the filename
-                    Hashes = CryptographyHelper.CalculateHashes(kvp.Key) // Calculate hashes for the password
-                })
-                // Convert each anonymous type to a string containing password, hashes, and filename separated by '|'
-                .Select(a => $"{a.Password}|{a.Hashes.MD5Hash}|{a.Hashes.SHA1Hash}|{a.Hashes.SHA256Hash}|{a.Filename}")
-            )
-            // Chunk each group into subgroups with a maximum number of lines specified by StaticDetails.MaximumLineNumberInIndexFiles
-            .Select(charGroup => charGroup.Chunk(StaticDetails.MaximumLineNumberInIndexFiles));
+            .SelectMany(grp =>
+                grp.Select(kvp => new {
+                    Password = kvp.Key,
+                    FileName = kvp.Value,
+                    Hashes = CryptographyHelper.CalculateHashes(kvp.Key)})
+                .Select(a => $"{a.Password}|{a.Hashes.MD5Hash}|{a.Hashes.SHA1Hash}|{a.Hashes.SHA256Hash}|{a.FileName}")
+                .Chunk(StaticDetails.MaximumLineNumberInIndexFiles)
+                .Select(chunk => new { CharGroup = grp.Key, Chunk = chunk }));
 
         int fileNaming = 0;
-        foreach (var chGroup in charGroups)
+        foreach (var item in charGroups)
         {
-            foreach (var chunk in chGroup)
-            {
-                var directory = FileHelper.CreateSubdirectoryInIndexDirectoryWithChar(chunk.First()[0]);
-                var filePath = Path.Combine(directory.ToString(), $"{fileNaming}.txt");
+            var directory = FileHelper.CreateSubdirectoryInIndexDirectoryWithChar(item.CharGroup[0]);
+            var filePath = Path.Combine(directory.ToString(), $"{fileNaming}.txt");
 
-                File.WriteAllLines(filePath, chunk);
+            File.WriteAllLines(filePath, item.Chunk);
 
-                fileNaming++;
-            }
+            fileNaming++;
         }
     }
 
