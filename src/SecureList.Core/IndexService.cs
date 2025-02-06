@@ -23,7 +23,7 @@ public class IndexService(PasswordRepository passwordRepository)
                     Hashes = CryptographyHelper.CalculateHashes(kvp.Key) // Calculate hashes for the password
                 })
                 // Convert each anonymous type to a string containing password, hashes, and filename separated by '|'
-                .Select(a => $"{a.Password}|{a.Hashes.md5Hash}|{a.Hashes.sha1Hash}|{a.Hashes.sha256Hash}|{a.Filename}")
+                .Select(a => $"{a.Password}|{a.Hashes.MD5Hash}|{a.Hashes.SHA1Hash}|{a.Hashes.SHA256Hash}|{a.Filename}")
             )
             // Chunk each group into subgroups with a maximum number of lines specified by StaticDetails.MaximumLineNumberInIndexFiles
             .Select(charGroup => charGroup.Chunk(StaticDetails.MaximumLineNumberInIndexFiles));

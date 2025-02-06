@@ -5,7 +5,7 @@ namespace SecureList.Core.Helpers;
 
 public static class CryptographyHelper
 {
-    public static (string md5Hash, string sha1Hash, string sha256Hash) CalculateHashes(string password)
+    public static (string MD5Hash, string SHA1Hash, string SHA256Hash) CalculateHashes(string password)
     {
         string md5Hash, sha1Hash, sha256Hash;
 
